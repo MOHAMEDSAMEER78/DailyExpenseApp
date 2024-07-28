@@ -1,0 +1,28 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:13
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_DB=daily_expenses_db
+      - POSTGRES_USER=daily_expenses_user
+      - POSTGRES_PASSWORD=daily_expenses_password
+
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - POSTGRES_DB=daily_expenses_db
+      - POSTGRES_USER=daily_expenses_user
+      - POSTGRES_PASSWORD=daily_expenses_password
+
+volumes:
+  postgres_data:

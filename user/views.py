@@ -40,8 +40,6 @@ def login_user(request):
         user = User.objects.all()
         user = User.objects.get(email=email)
         #password = hash_user_password(password)
-        print(password)
-        print(user.password)
         if not verify_user_password(password, user.password):
             return Response({'message': 'Invalid email or password'}, status=status.HTTP_400_BAD_REQUEST)
         return Response({'message': 'User logged in successfully'}, status=status.HTTP_200_OK)
@@ -91,7 +89,6 @@ def update_user(request, username):
         data = request.data
         user = User.objects.get(username=username)
         user.email = data['email']
-        user.username = data['username']
         user.mobile_phone = data['mobile_phone']
         user.password = hash_user_password(data['password']) # Hash the updated password
         user.balance = data.get('balance', user.balance)

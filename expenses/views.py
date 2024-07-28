@@ -20,7 +20,7 @@ def create_expense(request):
     except User.DoesNotExist:
         return Response({'message': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
-    expense_amount = data['expense_amount']
+    amount = data['expense_amount']
     category = data['category']
 
     # Check if category is valid
@@ -28,21 +28,21 @@ def create_expense(request):
         return Response({'message': 'Invalid category'}, status=status.HTTP_400_BAD_REQUEST)
 
     participants = data['participants']
-    
+
     if category == 'percentage':
         total_percentage = sum(participant.get('percentage', 0) for participant in participants)
         if total_percentage != 100:
             return Response({'message': 'Total percentage must be 100'}, status=status.HTTP_400_BAD_REQUEST)
-    
+
     elif category == 'equal':
-        split_amount = expense_amount / len(participants)
+        split_amount = amount / len(participants)
         for participant in participants:
             if participant.get('expense_amount', split_amount) != split_amount:
                 return Response({'message': f'Amount split is not equal for {participant.get("username")}'}, status=status.HTTP_400_BAD_REQUEST)
-    
+
     elif category == 'exact':
         total_amount = sum(participant.get('expense_amount', 0) for participant in participants)
-        if total_amount != expense_amount:
+        if total_amount != amount:
             return Response({'message': 'Total amount must be equal to the expense amount'}, status=status.HTTP_400_BAD_REQUEST)
 
     description = data['description']
@@ -72,7 +72,7 @@ def create_expense(request):
         amount = participant.get('expense_amount', 0)
         percentage = participant.get('percentage', 0)
         paid = participant.get('paid', False)
-        
+
         # Update participant's balance, but exclude the payer
         if participant_user != payer_user:
             participant_user.balance -= amount
@@ -86,7 +86,7 @@ def create_expense(request):
                 percentage=percentage, 
                 paid=paid
             )
-    
+
     # Update payer's balance
     if category == 'equal':
         payer_split_amount = split_amount * (len(participants) - 1)

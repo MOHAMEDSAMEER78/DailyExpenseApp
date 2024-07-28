@@ -20,7 +20,7 @@ def create_expense(request):
     except User.DoesNotExist:
         return Response({'message': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
-    amount = data['expense_amount']
+    expense_amount = data['expense_amount']
     category = data['category']
 
     # Check if category is valid
@@ -35,14 +35,14 @@ def create_expense(request):
             return Response({'message': 'Total percentage must be 100'}, status=status.HTTP_400_BAD_REQUEST)
     
     elif category == 'equal':
-        split_amount = amount / len(participants)
+        split_amount = expense_amount / len(participants)
         for participant in participants:
             if participant.get('expense_amount', split_amount) != split_amount:
                 return Response({'message': f'Amount split is not equal for {participant.get("username")}'}, status=status.HTTP_400_BAD_REQUEST)
     
     elif category == 'exact':
         total_amount = sum(participant.get('expense_amount', 0) for participant in participants)
-        if total_amount != amount:
+        if total_amount != expense_amount:
             return Response({'message': 'Total amount must be equal to the expense amount'}, status=status.HTTP_400_BAD_REQUEST)
 
     description = data['description']
